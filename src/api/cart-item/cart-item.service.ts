@@ -2,11 +2,16 @@ import { assign } from 'lodash';
 import { CartItem } from "./cart-item.entity";
 import { CartItem as CartItemModel } from './cart-item.model';
 import { NotFoundError } from '../../errors/not-found';
+import productService from "../product/product.service";
 
 
 export class CartItemService {
   
-  async find(): Promise<CartItem[]> {
+  async find(limit : number): Promise<CartItem[]> {
+    //limit the results returned
+    if (limit) {
+      return CartItemModel.find().limit(limit).populate('product');
+    }
     return CartItemModel.find().populate('product');
   }
 
@@ -19,37 +24,11 @@ export class CartItemService {
   }
 
   async add(item: CartItem): Promise<CartItem> {
-    // const newItem = new CartItemModel(item);
-    // await newItem.save();
-
-    const existing = await CartItemModel.findOne({product: item.product});
-    if (existing) {
-      return this.update(existing.id, {quantity: existing.quantity + item.quantity});
-    }
 
     const newItem = await CartItemModel.create(item);
     await newItem.populate('product');
-
+    const product = await productService.update(item.product, {stock: item.quantity});
     return newItem;
-  }
-
-  async update(id: string, data: Partial<CartItem>): Promise<CartItem> {
-    const item = await this._getById(id);
-    if (!item) {
-      throw new NotFoundError();
-    }
-    assign(item, data);
-    await item.save();
-
-    return item;
-  }
-
-  async remove(id: string): Promise<void> {
-    const item = await this._getById(id);
-    if (!item) {
-      throw new NotFoundError();
-    }
-    await item.deleteOne();
   }
 }
 

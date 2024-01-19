@@ -4,11 +4,11 @@ import app from './app';
 import mongoose from 'mongoose';
 
 mongoose.set('debug', true);
-mongoose.connect('mongodb://127.0.0.1:27017/its_2023_cart')
+mongoose.connect('mongodb+srv://danielbusettodb:Rabbit69@cluster0.u58z1in.mongodb.net/Esercitazioni?retryWrites=true&w=majority')
   .then(_ => {
     console.log('Connected to db');
-    app.listen(3000, () => {
-      console.log('Server listening on port 3000');
+    app.listen(8080, () => {
+      console.log('Server listening on port 8080');
     });
   })
   .catch(err => {

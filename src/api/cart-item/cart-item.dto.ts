@@ -1,20 +1,19 @@
-import { IsInt, Min, Max, IsMongoId } from "class-validator";
+import {IsInt, Min, Max, IsMongoId, IsNumber} from "class-validator";
 import { Type } from 'class-transformer';
 
 export class AddCartItemDTO {
   @IsMongoId()
-  productId: string;
+  product: string;
 
   @IsInt()
   @Min(1)
-  @Max(10)
   @Type(() => Number)
   quantity: number;
+
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
+  pricePerUnit: number;
 }
 
-export class UpdateQuantityDTO {
-  @IsInt()
-  @Min(1)
-  @Max(10)
-  quantity: number;
-}
+

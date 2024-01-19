@@ -4,10 +4,10 @@ import productService from '../product/product.service';
 import { CartItem } from './cart-item.entity';
 import { TypedRequest } from '../../utils/typed-request.interface';
 import { NotFoundError } from '../../errors/not-found';
-import { AddCartItemDTO, UpdateQuantityDTO } from './cart-item.dto';
+import { AddCartItemDTO } from './cart-item.dto';
 
 export const list = async (req: Request, res: Response, next: NextFunction) => {
-  const list = await cartItemService.find();
+  const list = await cartItemService.find(req.body.limit);
   res.json(list);
 }
 
@@ -18,16 +18,17 @@ export const add = async (
     
     try {
       
-      const { productId, quantity } = req.body;
+      const { product, quantity, pricePerUnit } = req.body;
       
-      const product = await productService.getById(productId);
-      if (!product) {
+      const productRes = await productService.getById(product);
+      if (!productRes) {
         throw new NotFoundError();
       }
       
-      const newItem: CartItem = {
-        product: productId,
-        quantity
+      const newItem: { product: string; quantity: number; pricePerUnit: number } = {
+        product: product,
+        quantity: quantity,
+        pricePerUnit: pricePerUnit
       };
       const saved = await cartItemService.add(newItem);
       res.json(saved);
@@ -35,30 +36,4 @@ export const add = async (
       next(err);
     }
 }
-  
-export const updateQuantity = async (
-  req: TypedRequest<UpdateQuantityDTO>,
-  res: Response,
-  next: NextFunction) => {
-    const id = req.params.id;
-    
-    try {
-      const newQuantity = req.body.quantity;
-      
-      const updated = await cartItemService.update(id, {quantity: newQuantity});
-      res.json(updated);
-    } catch(err: any) {
-      next(err);
-    }
-}
-    
-export const remove = async (req: Request, res: Response, next: NextFunction) => {
-  const id = req.params.id;
-  try {
-    await cartItemService.remove(id);
-    res.status(204);
-    res.send();
-  } catch(err: any) {
-    next(err);
-  }
-}
+

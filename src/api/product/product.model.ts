@@ -2,11 +2,19 @@ import  mongoose from 'mongoose';
 import { Product as iProduct} from './product.entity';
 
 export const productSchema = new mongoose.Schema<iProduct>({
-  name: String,
+  itemid: Number,
+  title: String,
   description: String,
   netPrice: Number,
-  discount: Number,
-  weight: Number
+  stock: Number,
+});
+
+productSchema.pre('save', async function(next) {
+  if (this.isNew) {
+    const count = await mongoose.model('Product').countDocuments();
+    this.itemid = count + 1;
+  }
+  next();
 });
 
 productSchema.set('toJSON', {

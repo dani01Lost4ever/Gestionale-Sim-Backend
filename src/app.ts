@@ -12,12 +12,6 @@ app.use(morgan('tiny'));
 app.use(bodyParser.json());
 
 app.use('/api', apiRouter);
-
-app.get('/', (req: Request, res: Response, next: NextFunction) => {
-  res.status(200);
-  res.send('Hello World');
-});
-
 app.use(errorHandlers);
 
 export default app;
